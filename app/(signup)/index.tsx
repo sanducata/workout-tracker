@@ -1,42 +1,58 @@
 import { useAuth } from '@/context/AuthContext';
-import { Link } from 'expo-router';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { TextInput, Button } from 'react-native-paper';
 
-const LoginScreen = () => {
+export const SignupScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { onLogin } = useAuth();
+  const [username, setUsername] = useState('');
+  const { onSignup } = useAuth();
+
+  const handleSignup = async (
+    username: string,
+    email: string,
+    password: string
+  ) => {
+    try {
+      await onSignup!(username, email, password);
+      router.replace('/(protected)');
+    } catch (error) {
+      console.error('An error has occured: ', error);
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Workout Tracker login page</Text>
+      <Text style={styles.title}>Create an account</Text>
       <TextInput
-        label='Email'
+        label={'Username'}
+        value={username}
+        onChangeText={setUsername}
+        style={styles.input}
+      />
+      <TextInput
+        label={'Email'}
         value={email}
         onChangeText={setEmail}
         style={styles.input}
-        keyboardType='email-address'
+        keyboardType={'email-address'}
       />
       <TextInput
-        label='Password'
+        label={'Password'}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
         style={styles.input}
       />
       <Button
-        mode='contained'
-        onPress={async () => onLogin!(email, password)}
+        mode={'contained'}
+        onPress={() => handleSignup(username, email, password)}
         style={styles.button}
       >
-        Log in
+        Sign up
       </Button>
-      <Text>Don't have an account? </Text>
-      <Link href={'/(signup)'} style={styles.link}>
-        <Text>Sign up!</Text>
-      </Link>
     </View>
   );
 };
@@ -60,7 +76,6 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 10,
   },
-  link: { color: 'blue' },
 });
 
-export default LoginScreen;
+export default SignupScreen;
